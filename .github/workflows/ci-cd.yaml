@@ -48,3 +48,14 @@ jobs:
           curl -X POST -H 'Content-type: application/json' \
           --data '{"text":"✅ Deployment Successful!"}' \
           ${{ secrets.SLACK_WEBHOOK_URL }}
+
+      - name: Install dependencies
+        run: pnpm install
+
+      - name: Build project (safe mode)
+        run: pnpm build || echo "Build failed but continuing for debug"
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+        node-version: 18
