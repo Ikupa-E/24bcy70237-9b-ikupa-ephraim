@@ -35,8 +35,9 @@ jobs:
 
       - name: Build Docker Image
         run: |
-          docker build -t ghcr.io/${{ github.repository }}:latest .
-          docker tag ghcr.io/${{ github.repository }}:latest ghcr.io/${{ github.repository }}:${{ github.sha }}
+         IMAGE=ghcr.io/${{ github.repository_owner,, }}/24bcy70237-9b-ikupa-ephraim
+         docker build -t $IMAGE:latest .
+         docker tag $IMAGE:latest $IMAGE:${{ github.sha }}
 
       - name: Push Docker Image
         run: |
@@ -48,14 +49,8 @@ jobs:
           curl -X POST -H 'Content-type: application/json' \
           --data '{"text":"✅ Deployment Successful!"}' \
           ${{ secrets.SLACK_WEBHOOK_URL }}
-
-      - name: Install dependencies
-        run: pnpm install
-
+    
       - name: Build project (safe mode)
         run: pnpm build || echo "Build failed but continuing for debug"
 
-      - name: Setup Node.js
-        uses: actions/setup-node@v3
-        with:
-         node-version: 20.11.0
+     
