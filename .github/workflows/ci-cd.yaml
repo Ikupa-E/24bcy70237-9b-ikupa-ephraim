@@ -35,15 +35,19 @@ jobs:
 
       - name: Build and Tag Docker Image
         run: |
-          IMAGE=ghcr.io/${{ github.repository_owner,, }}/24bcy70237-9b-ikupa-ephraim
-          docker build -t $IMAGE:latest .
-          docker tag $IMAGE:latest $IMAGE:${{ github.sha }}
+            OWNER=$(echo "${{ github.repository_owner }}" | tr '[:upper:]' '[:lower:]')
+            IMAGE=ghcr.io/$OWNER/24bcy70237-9b-ikupa-ephraim
+
+            docker build -t $IMAGE:latest .
+            docker tag $IMAGE:latest $IMAGE:${{ github.sha }}
 
       - name: Push Docker Image
         run: |
-          IMAGE=ghcr.io/${{ github.repository_owner,, }}/24bcy70237-9b-ikupa-ephraim
-          docker push $IMAGE:latest
-          docker push $IMAGE:${{ github.sha }}
+            OWNER=$(echo "${{ github.repository_owner }}" | tr '[:upper:]' '[:lower:]')
+            IMAGE=ghcr.io/$OWNER/24bcy70237-9b-ikupa-ephraim
+
+            docker push $IMAGE:latest
+            docker push $IMAGE:${{ github.sha }}
 
       - name: Slack Notification
         run: |
