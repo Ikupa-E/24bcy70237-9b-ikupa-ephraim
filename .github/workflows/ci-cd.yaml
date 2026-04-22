@@ -16,7 +16,7 @@ jobs:
       - name: Setup Node
         uses: actions/setup-node@v3
         with:
-          node-version: 18
+          node-version: 20.11.0
 
       - name: Install pnpm
         run: npm install -g pnpm
@@ -30,21 +30,27 @@ jobs:
       - name: Build app
         run: pnpm build
 
-            - name: Login to GitHub Container Registry
-        run: echo ${{ secrets.GITHUB_TOKEN }} | docker login ghcr.io -u ${{ github.actor }} --password-stdin
+      - name: Login to GitHub Container Registry
+        run: echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u ${{ github.actor }} --password-stdin
 
-      - name: Build Docker Image
+      - name: Build and Tag Docker Image
         run: |
-          docker build -t ghcr.io/${{ github.repository }}:latest .
-          docker tag ghcr.io/${{ github.repository }}:latest ghcr.io/${{ github.repository }}:${{ github.sha }}
+            OWNER=$(echo "${{ github.repository_owner }}" | tr '[:upper:]' '[:lower:]')
+            IMAGE=ghcr.io/$OWNER/24bcy70237-9b-ikupa-ephraim
+
+            docker build -t $IMAGE:latest .
+            docker tag $IMAGE:latest $IMAGE:${{ github.sha }}
 
       - name: Push Docker Image
         run: |
-          docker push ghcr.io/${{ github.repository }}:latest
-          docker push ghcr.io/${{ github.repository }}:${{ github.sha }}
+            OWNER=$(echo "${{ github.repository_owner }}" | tr '[:upper:]' '[:lower:]')
+            IMAGE=ghcr.io/$OWNER/24bcy70237-9b-ikupa-ephraim
+
+            docker push $IMAGE:latest
+            docker push $IMAGE:${{ github.sha }}
 
       - name: Slack Notification
         run: |
           curl -X POST -H 'Content-type: application/json' \
-          --data '{"text":"✅ Deployment Successful!"}' \
+          --data '{"text":"✅ Deployment Successful for ${{ github.repository }} 🚀"}' \
           ${{ secrets.SLACK_WEBHOOK_URL }}
